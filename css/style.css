@@ -1,0 +1,76 @@
+/* style.css - Estilos do site (noite mágica com toque fofo)
+   Comentários em português mostram onde alterar cores/espacamentos/fonte.
+*/
+
+/* VARIÁVEIS: altere aqui para trocar a paleta rapidamente */
+:root{
+  --bg1:#38385f;           /* cor de topo do gradiente do fundo */
+  --bg2:#38385f;           /* cor inferior do fundo */
+  --accent:#b8d8ff;        /* cor de destaque (botões, textos importantes) */
+  --soft:#d8c7f0;          /* tom suave para títulos */
+  --muted:#a8b0c3;         /* texto secundário */
+  --card:#0f1b2e;          /* fundo dos cards */
+  --glass: rgba(255,255,255,0.04);
+  --radius:14px;
+}
+
+/* Reset e fonte */
+*{box-sizing:border-box}
+html,body{height:100%;margin:0;font-family:Inter, Poppins, system-ui,-apple-system; color:#eef2ff;background:linear-gradient(180deg,var(--bg1),var(--bg2));-webkit-font-smoothing:antialiased}
+a{color:inherit}
+
+/* Overlay de entrada */
+#overlay{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(180deg,rgba(2,6,23,0.8),rgba(1,8,20,0.9));z-index:9998;backdrop-filter: blur(6px);transition:opacity .6s ease, transform .6s ease;}
+.intro-card{width:min(720px,92vw);background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));border-radius:20px;padding:28px;box-shadow:0 12px 40px rgba(3,6,23,0.6);text-align:center}
+.intro-card h1{margin:0;font-size:28px;color:var(--soft);text-shadow:0 6px 20px rgba(120,90,170,0.12)}
+.intro-card p{color:var(--muted);margin:12px 0 18px}
+.enter-btn{background:linear-gradient(90deg,#b8d8ff33,#d6c8ff44);border:1px solid rgba(184,216,255,0.14);padding:12px 22px;border-radius:14px;color:var(--soft);font-weight:600;cursor:pointer;backdrop-filter: blur(2px)}
+.enter-sub{font-size:13px;color:var(--muted);margin-top:8px}
+
+/* Layout */
+.wrap{max-width:1080px;margin:28px auto;padding:20px;position:relative;z-index:1}
+header{display:flex;align-items:center;gap:14px}
+.logo img{width:48px;height:48px;border-radius:10px}
+header h1{font-size:20px;margin:0;color:#f7f3ff}
+.lead{color:var(--muted);font-size:13px}
+nav{margin-left:auto;display:flex;gap:10px}
+nav a{padding:8px 12px;border-radius:12px;background:transparent;border:1px solid transparent;color:var(--accent);text-decoration:none;cursor:pointer}
+nav a:hover{background:rgba(184,216,255,0.06);border-color:rgba(184,216,255,0.08)}
+
+/* Main grid */
+main{display:grid;grid-template-columns:1fr 360px;gap:18px;margin-top:20px}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:16px;border-radius:var(--radius);box-shadow:0 8px 30px rgba(6,8,25,0.6);border:1px solid rgba(255,255,255,0.03)}
+.section-title{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.section-title h2{margin:0;font-size:18px;color:var(--soft)}
+
+/* Música */
+.music-list{display:flex;flex-direction:column;gap:10px}
+.music-iframe{width:100%;height:80px;border-radius:12px;border:0;overflow:hidden}
+
+/* Puzzle */
+.puzzle-wrap{display:flex;flex-direction:column;gap:12px;align-items:center}
+.puzzle{width:320px;height:320px;border-radius:12px;overflow:hidden;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);background:#0b1220;border:1px solid rgba(255,255,255,0.02)}
+.piece{display:grid;place-items:center;font-size:24px;cursor:pointer;user-select:none}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* Gallery */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.thumb img{width:100%;height: 100%;;object-fit:cover;border-radius:8px}
+
+/* Bloques secretos (minecraft) */
+.bloques{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.bloque{height:60px;border-radius:8px;background:linear-gradient(180deg,#0e2333,#123144);display:grid;place-items:center;color:transparent;cursor:pointer;border:1px solid rgba(255,255,255,0.02);padding:6px;text-align:center;font-size:13px}
+
+/* Confetti canvas e cursor */
+#confettiCanvas{position:fixed;pointer-events:none;left:0;top:0;display:none;z-index:9997}
+.star-cursor{position:fixed;pointer-events:none;width:22px;height:22px;transform:translate(-50%,-50%) rotate(15deg);z-index:9999;mix-blend-mode:screen;display:none}
+
+/* Footer */
+footer{margin-top:20px;text-align:center;color:var(--muted);font-size:13px}
+.muted{color:var(--muted)}
+.accent{color:var(--accent);font-weight:600}
+.small{font-size:13px}
+
+/* Responsividade */
+@media(max-width:980px){main{grid-template-columns:1fr}aside{order:2}}
+@media(max-width:670px){.gallery{grid-template-columns:repeat(1,1fr)}.puzzle{width:86vw;height:86vw}}

@@ -1,0 +1,206 @@
+
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rincón para Ella — noche mágica</title>
+
+  <!-- Link para o CSS separado -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!--
+    OVERLAY de entrada (tela inicial)
+    - Quando o usuário clicar em "Entrar a tu rincón" o overlay será escondido.
+    - Aqui também é o gatilho para carregar os embeds do Spotify e ativar o áudio ambiente.
+  -->
+  <div id="overlay" aria-hidden="false">
+    <div class="intro-card" role="dialog" aria-modal="true">
+      <h1>🌙 Bienvenida a tu rincón</h1>
+      <p class="lead">Un lugar pequeño, hecho con cariño — lleno de estrellas, música y sorpresas. Pulsa <strong>Entrar</strong> y la noche cobrará vida.</p>
+      <div style="display:flex;gap:12px;justify-content:center;margin-top:12px">
+        <button id="enterBtn" class="enter-btn" aria-label="Entrar a tu rincón">Entrar a tu rincón</button>
+      </div>
+      <div class="enter-sub">La música se activará después de pulsar Entrar. Si tu navegador bloquea audio, usa el botón ▶ junto a cada canción.</div>
+    </div>
+  </div>
+
+  <!-- cursor estrela (opcional; ativado por botão) -->
+  <svg class="star-cursor" id="starCursor" viewBox="0 0 24 24" width="24" height="24" style="display:none;">
+    <path d="M12 2 L14.2 8.5 L21 9.2 L15.5 13.8 L17.1 20.6 L12 16.9 L6.9 20.6 L8.5 13.8 L3 9.2 L9.8 8.5 Z" fill="#b8d8ff" opacity="0.95" />
+  </svg>
+
+  <!-- canvas para confetti -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Conteúdo principal do site (inicialmente escondido até clicar em Entrar) -->
+  <div class="wrap" id="siteContent" aria-hidden="true">
+    <header>
+      <div class="logo" aria-hidden>
+        <!-- LOGO: arquivo em assets/logo.svg
+             Para trocar: substitua assets/logo.svg
+        -->
+        <img src="assets/logo.png" alt="logo" width="42" height="42">
+      </div>
+      <div>
+        <h1>Rincón para ella — noche mágica</h1>
+        <div class="lead">Un sitio pequeño con cosas que la hacen sonreír</div>
+      </div>
+
+      <nav>
+        <!-- Navegação "one-page": muda a rolagem para cada seção -->
+        <a href="#musica">Música</a>
+        <a href="#puzzle">Puzzle</a>
+        <a href="#descubre">Descubre</a>
+        <a href="#detalles">Detalles</a>
+        <button id="toggleCursor" class="enter-btn" aria-pressed="false">Cursor estrella</button>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Coluna esquerda (conteúdo principal) -->
+      <section>
+        <!-- Seção Música -->
+        <div class="card" id="musica" tabindex="-1">
+          <div class="section-title"><h2>🎧 Tu música</h2></div>
+          <p class="muted">Algunas canciones que acompañan esta noche. Si tu navegador bloquea reproducción automática, pulsa ▶ en cada reproductor o usa el botón Entrar.</p>
+
+          <div class="music-list">
+            <!-- Iframes vazios — serão preenchidos pelo JS ao clicar "Entrar" -->
+            <iframe id="sp1" class="music-iframe" src="https://open.spotify.com/embed/track/41P6Tnd8KIHqON0QIydx6a?utm_source=generator" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+            <iframe id="sp2" class="music-iframe" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+            <iframe id="sp3" class="music-iframe" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+            <iframe id="sp4" class="music-iframe" src="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"></iframe>
+            
+          </div>
+        </div>
+
+        <!-- Seção Puzzle -->
+        <div class="card" id="puzzle" style="margin-top:14px">
+          <div class="section-title"><h2>🧩 Pequeño puzzle</h2></div>
+          <p class="muted">Organiza las piezas para revelar una ilustración nocturna. Haz clic en una pieza adyacente al hueco para moverla.</p>
+          <div class="puzzle-wrap">
+            <div id="puzzleGrid" class="puzzle" aria-label="Puzzle 3x3"></div>
+            <div class="controls">
+              <button id="shuffleBtn" class="enter-btn">Mezclar</button>
+              <button id="resetBtn" class="enter-btn">Resolver</button>
+              <div class="muted small">Presiona 's' para mezclar rápido</div>
+            </div>
+            <small class="muted">Imagen: una ilustración nocturna con cardigan y llaveros</small>
+            <div id="puzzleToast" class="accent" style="display:none">✨ ¡Lo lograste! Gracias por ser tú 💫</div>
+          </div>
+        </div>
+
+        <!-- Seção "Descubre" com blocos secretos -->
+        <div class="card" id="descubre" style="margin-top:14px">
+          <div class="section-title"><h2>🎮 Descubre</h2></div>
+          <p class="muted">Haz clic en los bloques para revelar mensajes escondidos.</p>
+          <div id="bloques" class="bloques" aria-live="polite"></div>
+        </div>
+
+        <!-- Seção Detalhes / Mensagens -->
+        <div class="card" id="detalles" style="margin-top:14px">
+          <div class="section-title"><h2>🧸 Detalles</h2></div>
+          <p class="muted">
+      Hay recuerdos que entran despacio y se quedan.<br>
+      La nuestra empezó así, entre píxeles y partidas: yo molestándote, tú riendo como un Snoopy travieso, y luego las dos hablando hasta la madrugada.<br>
+      No fue algo grandioso, fue real.<br><br>
+
+      Trajiste calma a mis días y le diste sentido a las cosas pequeñas:<br>
+      el ritual del café <span class="mini-text">(sigue siendo malo)</span>, la música que suena y se queda en la cabeza,<br>
+      la paciencia en un mundo caótico <span class="mini-text">(la paz debe reinar)</span>, y hasta la nostalgia dulce de las luces de Navidad.<br><br>
+
+      Lo que más me impresiona es cómo transformas lo ordinario en algo precioso:<br>
+      un gesto dulce se vuelve recuerdo, una playlist se convierte en refugio.<br>
+      Eres importante, no por un gesto espectacular, sino porque eliges quedarte,<br>
+      porque te ríes, porque a veces soportas mis tonterías y respondes con presencia.<br>
+      Eres increíble y tienes una luz propia que no necesita competir.<br><br>
+
+      Y sí, tengo guardada nuestra broma: <span class="camaron">“camarón caramelo”</span>.<br>
+      Cada vez que lo recuerde, voy a sonreír, porque es otra prueba de que nuestros pequeños secretos nos pertenecen.<br><br>
+
+      Gracias por hacer mis días más alegres. ✨
+    </p>
+          <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+            <button id="confettiBtn" class="enter-btn">¡Sorpresa! (Confetti)</button>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Coluna direita -->
+      <aside>
+        <div class="card" style="top:20px">
+          <div class="section-title"><h2>Galería & mini cosas</h2></div>
+          <div class="gallery" id="gallery">
+            <!-- Miniaturas: substitua os arquivos em assets/ se quiser imagens reais -->
+            <a class="thumb" href="#" ><img src="assets/image.png" alt=""></a>
+            <a class="thumb" href="#" ><img src="assets/image2.png" alt=""></a>
+            <a class="thumb" href="#" ><img src="assets/image3.png" alt=""></a>
+            <a class="thumb" href="#" ><img src="assets/image4.png" alt=""></a>
+            <a class="thumb" href="#" ><img src="assets/image5.png" alt=""></a>
+            <a class="thumb" href="#" ><img src="assets/image6.png" alt=""></a>
+            
+          </div>
+          <small class="muted" style="display:block;margin-top:10px">Pulsa una miniatura para ampliar.</small>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="section-title"><h2>Pequeña sorpresa</h2></div>
+          <p class="muted">Pulsa para ver un pequeño gesto de cariño.</p>
+          <div style="display:flex;gap:8px;justify-content:center">
+            <button id="miniConfetti" class="enter-btn">¡Confeti suave!</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <footer>
+      Hecho con cariño por <strong>su pato</strong>
+    </footer>
+  </div>
+
+  <!-- Link para o script principal -->
+  <script src="js/main.js"></script>
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
